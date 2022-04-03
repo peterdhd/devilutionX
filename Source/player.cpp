@@ -3131,7 +3131,7 @@ StartPlayerKill(int pnum, int earflag)
 		if (pnum == MyPlayerId) {
 			drawhpflag = true;
 
-			if (pcurs >= CURSOR_FIRSTITEM) {
+			if (!player.HoldItem.isEmpty()) {
 				DeadItem(player, std::move(player.HoldItem), { 0, 0 });
 				NewCursor(CURSOR_HAND);
 			}

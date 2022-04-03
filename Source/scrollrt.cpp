@@ -265,14 +265,14 @@ bool ShouldShowCursor()
  */
 void DrawCursor(const Surface &out)
 {
-	if (pcurs <= CURSOR_NONE || cursSize.width == 0 || cursSize.height == 0 || !ShouldShowCursor()) {
+	if (pcurs <= CURSOR_NONE || icursSize.width == 0 || icursSize.height == 0 || !ShouldShowCursor()) {
 		return;
 	}
 
 	// Copy the buffer before the item cursor and its 1px outline are drawn to a temporary buffer.
-	const int outlineWidth = IsItemSprite(pcurs) ? 1 : 0;
+	const int outlineWidth = !MyPlayer->HoldItem.isEmpty() ? 1 : 0;
 
-	if (MousePosition.x < -cursSize.width - outlineWidth || MousePosition.x - outlineWidth >= out.w() || MousePosition.y < -cursSize.height - outlineWidth || MousePosition.y - outlineWidth >= out.h())
+	if (MousePosition.x < -icursSize.width - outlineWidth || MousePosition.x - outlineWidth >= out.w() || MousePosition.y < -icursSize.height - outlineWidth || MousePosition.y - outlineWidth >= out.h())
 		return;
 
 	constexpr auto Clip = [](int &pos, std::uint32_t &length, std::uint32_t posEnd) {
@@ -285,15 +285,15 @@ void DrawCursor(const Surface &out)
 	};
 
 	sgdwCursX = MousePosition.x - outlineWidth;
-	sgdwCursWdt = cursSize.width + 2 * outlineWidth;
+	sgdwCursWdt = icursSize.width + 2 * outlineWidth;
 	Clip(sgdwCursX, sgdwCursWdt, out.w());
 
 	sgdwCursY = MousePosition.y - outlineWidth;
-	sgdwCursHgt = cursSize.height + 2 * outlineWidth;
+	sgdwCursHgt = icursSize.height + 2 * outlineWidth;
 	Clip(sgdwCursY, sgdwCursHgt, out.h());
 
 	BlitCursor(sgSaveBack, sgdwCursWdt, out.at(sgdwCursX, sgdwCursY), out.pitch());
-	CelDrawCursor(out, MousePosition + Displacement { 0, cursSize.height - 1 }, pcurs);
+	CelDrawCursor(out, MousePosition + Displacement { 0, icursSize.height - 1 }, pcurs);
 }
 
 /**
@@ -1573,7 +1573,7 @@ void ScrollView()
 {
 	bool scroll;
 
-	if (pcurs >= CURSOR_FIRSTITEM)
+	if (!MyPlayer->HoldItem.isEmpty())
 		return;
 
 	scroll = false;

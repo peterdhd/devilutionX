@@ -105,8 +105,6 @@ const uint16_t InvItemHeight2[] = {
 
 } // namespace
 
-/** Pixel size of the current cursor image */
-Size cursSize;
 /** Current highlighted monster */
 int pcursmonst = -1;
 /** Size of current cursor in inventory cells */
@@ -164,12 +162,6 @@ Size GetInvItemSize(int cursId)
 	return { InvItemWidth1[cursId], InvItemHeight1[cursId] };
 }
 
-void SetICursor(int cursId)
-{
-	icursSize = GetInvItemSize(cursId);
-	icursSize28 = icursSize / 28;
-}
-
 void ResetCursor()
 {
 	NewCursor(pcurs);
@@ -181,8 +173,8 @@ void NewCursor(int cursId)
 		MyPlayer->HoldItem._itype = ItemType::None;
 	}
 	pcurs = cursId;
-	cursSize = GetInvItemSize(cursId);
-	SetICursor(cursId);
+	icursSize = GetInvItemSize(cursId);
+	icursSize28 = icursSize / 28;
 	if (IsHardwareCursorEnabled() && ControlMode == ControlTypes::KeyboardAndMouse && GetCurrentCursorInfo() != CursorInfo::GameCursor(cursId) && cursId != CURSOR_NONE) {
 		SetHardwareCursor(CursorInfo::GameCursor(cursId));
 	}
@@ -192,8 +184,9 @@ void CelDrawCursor(const Surface &out, Point position, int cursId)
 {
 	const auto &sprite = GetInvItemSprite(cursId);
 	const int frame = GetInvItemFrame(cursId);
-	if (IsItemSprite(cursId)) {
-		const auto &heldItem = Players[MyPlayerId].HoldItem;
+
+	if (!MyPlayer->HoldItem.isEmpty()) {
+		const auto &heldItem = MyPlayer->HoldItem;
 		CelBlitOutlineTo(out, GetOutlineColor(heldItem, true), position, sprite, frame, false);
 		CelDrawItem(heldItem, out, position, sprite, frame);
 	} else {

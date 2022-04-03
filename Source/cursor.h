@@ -32,7 +32,6 @@ enum cursor_id : uint8_t {
 	CURSOR_FIRSTITEM,
 };
 
-extern DVL_API_FOR_TEST Size cursSize;
 extern int pcursmonst;
 extern DVL_API_FOR_TEST Size icursSize28;
 extern DVL_API_FOR_TEST Size icursSize;
@@ -46,7 +45,6 @@ extern DVL_API_FOR_TEST int pcurs;
 
 void InitCursor();
 void FreeCursor();
-void SetICursor(int cursId);
 void ResetCursor();
 void NewCursor(int cursId);
 void InitLevelCursor();

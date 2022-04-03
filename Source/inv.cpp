@@ -296,10 +296,9 @@ void CheckInvPaste(int pnum, Point cursorPosition)
 {
 	auto &player = Players[pnum];
 
-	SetICursor(player.HoldItem._iCurs + CURSOR_FIRSTITEM);
 	int i = cursorPosition.x + (IsHardwareCursor() ? 0 : (icursSize.width / 2));
 	int j = cursorPosition.y + (IsHardwareCursor() ? 0 : (icursSize.height / 2));
-	Size itemSize { icursSize28 };
+	const Size itemSize = GetInventorySize(player.HoldItem);
 	bool done = false;
 	int r = 0;
 	for (; r < NUM_XY_SLOTS && !done; r++) {
@@ -513,14 +512,10 @@ void CheckInvPaste(int pnum, Point cursorPosition)
 				player.HoldItem = player.InvBody[INVLOC_HAND_LEFT];
 			if (pnum == MyPlayerId)
 				NewCursor(player.HoldItem._iCurs + CURSOR_FIRSTITEM);
-			else
-				SetICursor(player.HoldItem._iCurs + CURSOR_FIRSTITEM);
 			bool done2h = AutoPlaceItemInInventory(player, player.HoldItem, true);
 			player.HoldItem = tempitem;
 			if (pnum == MyPlayerId)
 				NewCursor(player.HoldItem._iCurs + CURSOR_FIRSTITEM);
-			else
-				SetICursor(player.HoldItem._iCurs + CURSOR_FIRSTITEM);
 			if (!done2h)
 				return;
 
@@ -622,7 +617,7 @@ void CheckInvPaste(int pnum, Point cursorPosition)
 	CalcPlrInv(player, true);
 	if (pnum == MyPlayerId) {
 		if (cn == CURSOR_HAND && !IsHardwareCursor())
-			SetCursorPos(MousePosition + Displacement(cursSize / 2));
+			SetCursorPos(MousePosition + Displacement(icursSize / 2));
 		NewCursor(cn);
 	}
 }
@@ -896,7 +891,7 @@ void CheckInvCut(int pnum, Point cursorPosition, bool automaticMove, bool dropIt
 				NewCursor(holdItem._iCurs + CURSOR_FIRSTITEM);
 				if (!IsHardwareCursor() && !dropItem) {
 					// For a hardware cursor, we set the "hot point" to the center of the item instead.
-					SetCursorPos(cursorPosition - Displacement(cursSize / 2));
+					SetCursorPos(cursorPosition - Displacement(icursSize / 2));
 				}
 			}
 		}
@@ -1636,7 +1631,7 @@ void TransferItemToStash(Player &player, int location)
 
 void CheckInvItem(bool isShiftHeld, bool isCtrlHeld)
 {
-	if (pcurs >= CURSOR_FIRSTITEM) {
+	if (!MyPlayer->HoldItem.isEmpty()) {
 		CheckInvPaste(MyPlayerId, MousePosition);
 	} else if (IsStashOpen && isCtrlHeld) {
 		TransferItemToStash(*MyPlayer, pcursinvitem);
@@ -1667,7 +1662,7 @@ void InvGetItem(int pnum, int ii)
 
 	auto &player = Players[pnum];
 
-	if (MyPlayerId == pnum && pcurs >= CURSOR_FIRSTITEM)
+	if (MyPlayerId == pnum && !player.HoldItem.isEmpty())
 		NetSendCmdPItem(true, CMD_SYNCPUTITEM, player.position.tile, player.HoldItem);
 
 	item._iCreateInfo &= ~CF_PREGEN;
@@ -1675,13 +1670,14 @@ void InvGetItem(int pnum, int ii)
 	CheckQuestItem(player, player.HoldItem);
 	UpdateBookLevel(player, player.HoldItem);
 	player.HoldItem._iStatFlag = player.CanUseItem(player.HoldItem);
-	bool cursorUpdated = false;
-	if (player.HoldItem._itype == ItemType::Gold && GoldAutoPlace(player, player.HoldItem))
-		cursorUpdated = true;
+	if (player.HoldItem._itype == ItemType::Gold && GoldAutoPlace(player, player.HoldItem)) {
+		player.HoldItem._itype == ItemType::None;
+	}
 	CleanupItems(ii);
 	pcursitem = -1;
-	if (!cursorUpdated)
+	if (!player.HoldItem.isEmpty()) {
 		NewCursor(player.HoldItem._iCurs + CURSOR_FIRSTITEM);
+	}
 }
 
 void AutoGetItem(int pnum, Item *itemPointer, int ii)
@@ -1701,7 +1697,6 @@ void AutoGetItem(int pnum, Item *itemPointer, int ii)
 	CheckQuestItem(player, item);
 	UpdateBookLevel(player, item);
 	item._iStatFlag = player.CanUseItem(item);
-	SetICursor(item._iCurs + CURSOR_FIRSTITEM);
 
 	bool done;
 	bool autoEquipped = false;

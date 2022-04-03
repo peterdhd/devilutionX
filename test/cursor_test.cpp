@@ -10,8 +10,6 @@ TEST(Cursor, SetCursor)
 	int i = ICURS_SPIKED_CLUB + CURSOR_FIRSTITEM;
 	NewCursor(i);
 	EXPECT_EQ(pcurs, i);
-	EXPECT_EQ(cursSize.width, 1 * 28);
-	EXPECT_EQ(cursSize.height, 3 * 28);
 	EXPECT_EQ(icursSize.width, 1 * 28);
 	EXPECT_EQ(icursSize.height, 3 * 28);
 	EXPECT_EQ(icursSize28.width, 1);
