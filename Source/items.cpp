@@ -2843,9 +2843,12 @@ void CreatePlrItems(int playerId)
 		InitializeItem(player.InvBody[INVLOC_HAND_RIGHT], IDI_WARRSHLD);
 		GenerateNewSeed(player.InvBody[INVLOC_HAND_RIGHT]);
 
-		InitializeItem(player.HoldItem, IDI_WARRCLUB);
-		GenerateNewSeed(player.HoldItem);
-		AutoPlaceItemInInventory(player, player.HoldItem, true);
+		InitializeItem(player.InvList[player._pNumInv], IDI_WARRCLUB);
+		GenerateNewSeed(player.InvList[player._pNumInv]);
+		player._pNumInv++;
+		player.InvGrid[0] = -player._pNumInv;
+		player.InvGrid[10] = -player._pNumInv;
+		player.InvGrid[20] = player._pNumInv;
 
 		InitializeItem(player.SpdList[0], IDI_HEAL);
 		GenerateNewSeed(player.SpdList[0]);
