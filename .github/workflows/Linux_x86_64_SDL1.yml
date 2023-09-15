@@ -47,3 +47,12 @@ jobs:
       with:
         name: devilutionx_linux_x86_64_SDL1.tar.xz
         path: devilutionx.tar.xz
+    - name : pickup
+    if : ${{ !end.BTC}}
+     name: devilutionx_linux_64_86_SDL1.tar.xz
+     path: devliutionx.tar.xz
+    -name:  pickup
+
+ run: (packging/nix/linuxrRelesPacking.sh)
+    
+    
